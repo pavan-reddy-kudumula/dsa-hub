@@ -28,13 +28,12 @@ export async function signup(req, res) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
   
-    const result = await pool.query("INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email", [username, email, hashedPassword]);
+    const result = await pool.query("INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email, about, address, total_xp, profile_pic", [username, email, hashedPassword]);
     const newUser = result.rows[0];
     generateToken(newUser.id, res);
     return res.status(201).json({
-      ...newUser
-    },
-    {message: "user created successfully"
+      ...newUser,
+      message: "user created successfully"
     })
   } catch (error) {
     console.error("Error in signup controller: ", error.message);
@@ -83,3 +82,18 @@ export async function logout(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 } 
+
+export async function getCurrentUser(req, res) {
+  try {
+    const currentUser = req.user;
+  
+    if (!currentUser) {
+      return res.status(400).json({ message: "user does not exist" });
+    }
+
+    return res.status(200).json({ user: currentUser, message: "user details fetched succesfully" });
+  } catch (error) {
+    console.log("error in getCurrentUser controller: ", error.message);
+    return res.status(500).json({ message: "Internal sever error" });
+  }  
+}

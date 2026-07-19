@@ -13,7 +13,7 @@ export default async function protectRoute(req, res, next) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const { rows } = await pool.query(
-      "SELECT id, username, email FROM users WHERE id = $1",
+      "SELECT id, username, email, about, address, total_xp, profile_pic FROM users WHERE id = $1",
       [decoded.userId],
     );
     if (rows.length == 0) {
@@ -23,7 +23,15 @@ export default async function protectRoute(req, res, next) {
     req.user = rows[0];
     next();
   } catch (error) {
-    console.log("error in protectRoute middleware:", error.message);
+    if (
+          error instanceof jwt.JsonWebTokenError ||
+          error instanceof jwt.TokenExpiredError
+        ) {
+          return res.status(401).json({
+            message: "Unauthorized - Invalid or expired token",
+          });
+        }
+    console.error("error in protectRoute middleware:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 }
