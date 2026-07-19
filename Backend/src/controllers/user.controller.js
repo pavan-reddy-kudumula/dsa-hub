@@ -1,6 +1,6 @@
 import pool from "../config/db.js";
 
-export async function getUser(req, res) {
+export async function getUser(req, res, next) {
   try {
     const { username } = req.params;
     if (!username) {
@@ -13,23 +13,21 @@ export async function getUser(req, res) {
       return res.status(401).json({ message: "user does not exist" });
     }
     return res.status(200).json({ user, message: "user fetched successfully" });
-  } catch (error) {
-    console.error("error in getCurrentUser method in user controller:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
+  } catch (err) {
+    next(err);
   }
 }
 
-export async function getAllUsers(req, res) {
+export async function getAllUsers(req, res, next) {
   try {
     const result = await pool.query("SELECT id, username, email, about, address, total_xp, profile_pic FROM users");
     return res.status(200).json({ users: result.rows, message: "users fetched successfully" });
-  } catch (error) {
-    console.error("error in getCurrentUser method in user controller:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
+  } catch (err) {
+    next(err);
   }
 }
 
-export async function updateUserData(req, res) {
+export async function updateUserData(req, res, next) {
   try {
     const { username, about, address } = req.body || {};
     const userId = req.user.id;
@@ -78,15 +76,12 @@ export async function updateUserData(req, res) {
       user: result.rows[0],
       message: "User updated successfully",
     });
-  } catch (error) {
-    console.error("error in updateUserData method in user controller:", error.message);
-    res.status(500).json({
-      message: "Internal server error",
-    });
+  } catch (err) {
+    next(err);
   }
 }
 
-export async function updateUserProfilePic(req, res) {
+export async function updateUserProfilePic(req, res, next) {
   try {
     const profile_pic = req.body?.profilePic;
     const userId = req.user?.id;
@@ -116,16 +111,13 @@ export async function updateUserProfilePic(req, res) {
     }
   
     return res.status(200).json({ user: result.rows[0], message: "profile picture updated successfully" });
-  } catch (error) {
-    console.error("error in updateUserProfilePic method in user controller:", error.message);
-    res.status(500).json({
-      message: "Internal server error",
-    });
+  } catch (err) {
+    next(err);
   }
 
 }
 
-export async function deleteUser(req, res) {
+export async function deleteUser(req, res, next) {
   try {
     const userId = req.user?.id;
 
@@ -138,10 +130,7 @@ export async function deleteUser(req, res) {
       return res.status(400).json({ message: "user does not exist" });
     }
     return res.status(200).json({ user: result.rows[0], message: "user deleted successfully" });
-  } catch (error) {
-    console.log("error in deleteuser method in user controller:", error.message);
-    res.status(500).json({
-      message: "Internal server error",
-    });
+  } catch (err) {
+    next(err);
   }
 }

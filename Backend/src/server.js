@@ -4,6 +4,7 @@ import pool from "./config/db.js"
 import cookieParser from "cookie-parser"
 import authRouter from "../src/routes/auth.route.js"
 import userRouter from "../src/routes/user.route.js"
+import { errorHandler } from "./middleware/errorHandler.middleware.js"
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
+app.use(errorHandler);
 
 app.router.get("/health-check", (req, res) => {
   return res.status(200).json({ message: "server is live" });

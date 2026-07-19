@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs"
 import pool from "../config/db.js"
 import {generateToken} from "../lib/utils.js"
 
-export async function signup(req, res) {
+export async function signup(req, res, next) {
   try {
     const { username, email, password } = req.body;
   
@@ -35,13 +35,12 @@ export async function signup(req, res) {
       ...newUser,
       message: "user created successfully"
     })
-  } catch (error) {
-    console.error("Error in signup controller: ", error.message);
-    return res.status(500).json({message: "Internal server error"})
+  } catch (err) {
+    next(err);
   }
 }
 
-export async function login(req, res) {
+export async function login(req, res, next) {
   try {
     const { email, password } = req.body;
   
@@ -67,23 +66,21 @@ export async function login(req, res) {
       username: existingUser.username,
       email: existingUser.email
     })
-  } catch (error) {
-    console.log("error in login controller ", error.message)
-    return res.status(500).json({message: "Internal server error"})
+  } catch (err) {
+    next(err);
   }
 }
 
-export async function logout(req, res) {
+export async function logout(req, res, next) {
   try {
     res.cookie("jwt", "", { maxAge: 0 });
     return res.status(200).json({ message: "Logged out successfully" });
-  } catch (error) {
-    console.log("error in logout controller ", error.message);
-    res.status(500).json({ message: "Internal server error" });
+  } catch (err) {
+    next(err);
   }
 } 
 
-export async function getCurrentUser(req, res) {
+export async function getCurrentUser(req, res, next) {
   try {
     const currentUser = req.user;
   
@@ -92,8 +89,7 @@ export async function getCurrentUser(req, res) {
     }
 
     return res.status(200).json({ user: currentUser, message: "user details fetched succesfully" });
-  } catch (error) {
-    console.log("error in getCurrentUser controller: ", error.message);
-    return res.status(500).json({ message: "Internal sever error" });
-  }  
+  } catch (err) {
+    next(err);
+  }
 }
