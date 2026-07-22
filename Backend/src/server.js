@@ -19,7 +19,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/patterns", patternRouter);
 app.use(errorHandler);
-app.use(verifyAdmin)
 
 app.router.get("/health-check", (req, res) => {
   return res.status(200).json({ message: "server is live" });
