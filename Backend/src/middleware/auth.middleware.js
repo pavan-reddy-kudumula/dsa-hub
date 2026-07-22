@@ -13,7 +13,7 @@ export default async function protectRoute(req, res, next) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const { rows } = await pool.query(
-      "SELECT id, username, email, about, address, total_xp, profile_pic FROM users WHERE id = $1",
+      "SELECT id, username, email, role, about, address, total_xp, profile_pic FROM users WHERE id = $1",
       [decoded.userId],
     );
     if (rows.length == 0) {

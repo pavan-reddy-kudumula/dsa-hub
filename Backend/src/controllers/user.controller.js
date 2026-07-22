@@ -7,21 +7,12 @@ export async function getUser(req, res, next) {
       return res.status(400).json({ message: "Invalid username" });
     }
   
-    const result = await pool.query("SELECT id, username, email, about, address, total_xp, profile_pic FROM users WHERE username=$1", [username]);
+    const result = await pool.query("SELECT id, username, email, role, about, address, total_xp, profile_pic FROM users WHERE username=$1", [username]);
     const user = result.rows[0];
     if (!user) {
       return res.status(401).json({ message: "user does not exist" });
     }
     return res.status(200).json({ user, message: "user fetched successfully" });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function getAllUsers(req, res, next) {
-  try {
-    const result = await pool.query("SELECT id, username, email, about, address, total_xp, profile_pic FROM users");
-    return res.status(200).json({ users: result.rows, message: "users fetched successfully" });
   } catch (err) {
     next(err);
   }
@@ -116,6 +107,21 @@ export async function updateUserProfilePic(req, res, next) {
   }
 
 }
+
+export async function updateUserRole(req, res, next) {
+  try {
+    const { id } = req.params || undefined;
+    const { role } = req.body || undefined;
+    console.log(id, role);
+    if (!id || !role || (role !== 'admin' && role !== 'user')) {
+      return res.status(400).json({ message: "All fields are required and role should contain a proper value" });
+    }
+    const { rows } = await pool.query("UPDATE users SET role = $1 WHERE id = $2 RETURNING id, username, email, about, address, total_xp, role", [role, id]);
+    return res.status(200).json({ user: rows[0], message: "user role updated successfully" });
+  } catch (err) {
+    next(err);
+  }
+} 
 
 export async function deleteUser(req, res, next) {
   try {
