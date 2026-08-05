@@ -5,9 +5,8 @@ import cookieParser from "cookie-parser"
 import authRouter from "../src/routes/auth.route.js"
 import userRouter from "../src/routes/user.route.js"
 import patternRouter from "../src/routes/pattern.route.js"
+import questionRouter from "../src/routes/question.route.js"
 import { errorHandler } from "./middleware/errorHandler.middleware.js"
-import verifyAdmin from "./middleware/admin.middleware.js"
-
 dotenv.config();
 
 const app = express();
@@ -18,6 +17,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/patterns", patternRouter);
+app.use("/api/questions", questionRouter);
 app.use(errorHandler);
 
 app.router.get("/health-check", (req, res) => {

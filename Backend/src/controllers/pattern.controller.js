@@ -1,6 +1,5 @@
 import pool from "../config/db.js";
-
-const difficultyEnum = ['basic', 'easy', 'medium', 'hard'];
+import { difficultyEnum } from "../constants/enums.js";
 
 const toNumberOrUndefined = (value) =>
   value !== undefined ? Number(value) : undefined;
@@ -46,6 +45,12 @@ export async function getPatternQuestions(req, res, next) {
 
     const { rows } = await pool.query("SELECT * FROM questions WHERE pattern_id = $1 ORDER BY display_order", [patternId]);
 
+    if (rows.length === 0) {
+      const err = new Error("pattern_id does not exist");
+      err.statusCode = 400;
+      throw err;
+    }
+    
     return res.status(200).json({ questions: rows, message: "Questions fetched successfully" });
   } catch (err) {
     next(err);
@@ -129,7 +134,6 @@ export async function createQuestion(req, res, next) {
     const patternId = toNumberOrUndefined(req.params?.patternId);
     const cleanTitle = (typeof title === "string" && title.trim() !== "") ? title.trim() : undefined;
     const cleanProblemStatement = (typeof problem_statement === "string" && problem_statement.trim() !== "") ? problem_statement.trim() : undefined;
-    const cleanNotes = (typeof notes === "string" && notes.trim() !== "") ? notes.trim() : undefined;
     const cleanDifficulty = (typeof difficulty === "string") ? difficulty.trim().toLowerCase() : undefined; 
     const estimatedTime = toNumberOrUndefined(req.body?.estimated_time);
     const displayOrder = toNumberOrUndefined(req.body?.display_order);
@@ -159,8 +163,17 @@ export async function createQuestion(req, res, next) {
       throw err;      
     }
 
-    client = await pool.connect();
-    
+    if (notes !== undefined && typeof notes !== "string") {
+      const err = new Error("notes must be text.")
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const cleanNotes =
+      notes !== undefined
+        ? (notes.trim() !== "" ? notes.trim() : undefined)
+        : undefined;
+
     const columns = [];
     const placeholders = [];
     const values = []
@@ -177,24 +190,19 @@ export async function createQuestion(req, res, next) {
       values.push(cleanNotes);
     }
 
-    if (
-      estimatedTime !== undefined &&
-      (
-      !Number.isInteger(estimatedTime) ||
-      estimatedTime <= 0
-      )
-    ) {
-      const err = new Error("Estimated time must be a positive integer");
-      err.statusCode = 400;
-      throw err;
-    }
-   
-    if(estimatedTime !== undefined) {
-      columns.push(`estimated_time`);
+    if (estimatedTime !== undefined) {
+      if (!Number.isInteger(estimatedTime) || estimatedTime <= 0) {
+        const err = new Error("Estimated time must be a positive integer");
+        err.statusCode = 400;
+        throw err;
+      }
+    
+      columns.push("estimated_time");
       placeholders.push(`$${index++}`);
       values.push(estimatedTime);
     }
     
+    client = await pool.connect();
     await client.query("BEGIN");
     transactionBegin = true;
 

@@ -1,0 +1,1 @@
+export const difficultyEnum = ['basic', 'easy', 'medium', 'hard'];
