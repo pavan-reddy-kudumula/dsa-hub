@@ -115,7 +115,7 @@ export async function createPattern(req, res, next) {
     
     if (err.code === '23505' && err.constraint?.includes('name')) {
       err.message = "Name already exists";
-      err.statusCode = 400;
+      err.statusCode = 409;
     }
     
     next(err);
@@ -260,7 +260,7 @@ export async function createQuestion(req, res, next) {
     
     if (err.code === '23505' && err.constraint === "questions_pattern_title_unique") {
       err.message = "Question title already exists in this pattern.";
-      err.statusCode = 400;
+      err.statusCode = 409;
     }
     
     next(err);

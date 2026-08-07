@@ -6,6 +6,7 @@ import authRouter from "../src/routes/auth.route.js"
 import userRouter from "../src/routes/user.route.js"
 import patternRouter from "../src/routes/pattern.route.js"
 import questionRouter from "../src/routes/question.route.js"
+import topicRouter from "../src/routes/topic.route.js"
 import { errorHandler } from "./middleware/errorHandler.middleware.js"
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/patterns", patternRouter);
 app.use("/api/questions", questionRouter);
+app.use("/api/topics", topicRouter);
 app.use(errorHandler);
 
 app.router.get("/health-check", (req, res) => {
