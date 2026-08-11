@@ -38,7 +38,7 @@ export async function getTopic(req, res, next) {
 
 export async function createTopic(req, res, next) {
   try {
-    const cleanName = req.body?.name?.trim();
+    const cleanName = req.body?.name?.trim().toLowerCase();
 
     if (typeof cleanName !== "string" || cleanName === "") {
       const err = new Error("Topic name must be a string.");
@@ -63,7 +63,7 @@ export async function createTopic(req, res, next) {
 export async function updateTopic(req, res, next) {
   try {
     const cleanId = toNumberOrUndefined(req.params?.id);
-    const cleanName = req.body?.name?.trim();
+    const cleanName = req.body?.name?.trim().toLowerCase();
 
     if (!Number.isInteger(cleanId) || cleanId < 1) {
       const err = new Error("Topic ID must be a positive integer.");
