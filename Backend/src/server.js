@@ -8,6 +8,7 @@ import patternRouter from "../src/routes/pattern.route.js"
 import questionRouter from "../src/routes/question.route.js"
 import questionExampleRouter from "../src/routes/questionExample.route.js"
 import questionTopicRouter from "../src/routes/questionTopic.route.js"
+import questionPlatformRouter from "../src/routes/questionPlatform.route.js"
 import topicRouter from "../src/routes/topic.route.js"
 import { errorHandler } from "./middleware/errorHandler.middleware.js"
 dotenv.config();
@@ -23,6 +24,7 @@ app.use("/api/patterns", patternRouter);
 app.use("/api/questions", questionRouter);
 app.use("/api/questions", questionExampleRouter);
 app.use("/api/questions", questionTopicRouter);
+app.use("/api/questions", questionPlatformRouter);
 app.use("/api/topics", topicRouter);
 app.use(errorHandler);
 
