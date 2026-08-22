@@ -239,6 +239,8 @@ export async function createQuestion(req, res, next) {
 
     const { rows } = await client.query(`INSERT INTO questions (${columns.join(", ")}) VALUES (${placeholders.join(", ")}) RETURNING id, pattern_id, title, problem_statement, notes, difficulty, display_order, estimated_time, xp`, values);
 
+    await client.query("INSERT INTO user_questions (user_id, question_id) SELECT id, $1 FROM users", [rows[0].id]);
+    
     await client.query("COMMIT");
     transactionBegin = false;
     

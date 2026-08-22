@@ -4,6 +4,7 @@ import pool from "./config/db.js"
 import cookieParser from "cookie-parser"
 import authRouter from "../src/routes/auth.route.js"
 import userRouter from "../src/routes/user.route.js"
+import userQuestionRouter from "../src/routes/userQuestion.route.js"
 import patternRouter from "../src/routes/pattern.route.js"
 import questionRouter from "../src/routes/question.route.js"
 import questionExampleRouter from "../src/routes/questionExample.route.js"
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/users", userQuestionRouter);
 app.use("/api/patterns", patternRouter);
 app.use("/api/questions", questionRouter);
 app.use("/api/questions", questionExampleRouter);
