@@ -1,0 +1,1 @@
+export const toNumberOrUndefined = (value) => (value !== undefined) ? Number(value) : undefined;
