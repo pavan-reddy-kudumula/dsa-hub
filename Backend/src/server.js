@@ -12,6 +12,7 @@ import questionTopicRouter from "../src/routes/questionTopic.route.js"
 import questionPlatformRouter from "../src/routes/questionPlatform.route.js"
 import topicRouter from "../src/routes/topic.route.js"
 import bookmarkRouter from "../src/routes/bookmark.route.js"
+import noteRouter from "../src/routes/note.route.js"
 import { errorHandler } from "./middleware/errorHandler.middleware.js"
 dotenv.config();
 
@@ -29,7 +30,9 @@ app.use("/api/questions", questionExampleRouter);
 app.use("/api/questions", questionTopicRouter);
 app.use("/api/questions", questionPlatformRouter);
 app.use("/api/topics", topicRouter);
+app.use("/api/notes", noteRouter);
 app.use("/api/bookmarks", bookmarkRouter);
+
 app.use(errorHandler);
 
 app.router.get("/health-check", (req, res) => {
