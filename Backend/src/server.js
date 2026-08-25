@@ -10,9 +10,11 @@ import questionRouter from "../src/routes/question.route.js"
 import questionExampleRouter from "../src/routes/questionExample.route.js"
 import questionTopicRouter from "../src/routes/questionTopic.route.js"
 import questionPlatformRouter from "../src/routes/questionPlatform.route.js"
+import questionCompanyRouter from "../src/routes/questionCompany.route.js"
 import topicRouter from "../src/routes/topic.route.js"
 import bookmarkRouter from "../src/routes/bookmark.route.js"
 import noteRouter from "../src/routes/note.route.js"
+import companyRouter from "../src/routes/company.route.js"
 import { errorHandler } from "./middleware/errorHandler.middleware.js"
 dotenv.config();
 
@@ -29,8 +31,10 @@ app.use("/api/questions", questionRouter);
 app.use("/api/questions", questionExampleRouter);
 app.use("/api/questions", questionTopicRouter);
 app.use("/api/questions", questionPlatformRouter);
+app.use("/api/questions", questionCompanyRouter);
 app.use("/api/topics", topicRouter);
 app.use("/api/notes", noteRouter);
+app.use("/api/companies", companyRouter);
 app.use("/api/bookmarks", bookmarkRouter);
 
 app.use(errorHandler);
