@@ -105,7 +105,12 @@ export async function login(req, res, next) {
 
 export async function logout(req, res, next) {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
+      path: "/",
+    });
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
     next(err);
