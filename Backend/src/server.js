@@ -12,6 +12,7 @@ import questionExampleRouter from "../src/routes/questionExample.route.js"
 import questionTopicRouter from "../src/routes/questionTopic.route.js"
 import questionPlatformRouter from "../src/routes/questionPlatform.route.js"
 import questionCompanyRouter from "../src/routes/questionCompany.route.js"
+import questionSolutionRouter from "./routes/questionSolution.route.js"
 import topicRouter from "../src/routes/topic.route.js"
 import bookmarkRouter from "../src/routes/bookmark.route.js"
 import noteRouter from "../src/routes/note.route.js"
@@ -37,6 +38,7 @@ app.use("/api/questions", questionExampleRouter);
 app.use("/api/questions", questionTopicRouter);
 app.use("/api/questions", questionPlatformRouter);
 app.use("/api/questions", questionCompanyRouter);
+app.use("/api/questions", questionSolutionRouter);
 app.use("/api/topics", topicRouter);
 app.use("/api/notes", noteRouter);
 app.use("/api/companies", companyRouter);
