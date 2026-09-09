@@ -11,21 +11,62 @@ const insertQueryField = (updates, values, field, fieldVal) => {
 export async function getQuestionById(req, res, next) {
   try {
     const questionId = req.params?.id;
-    const cleanquestionId = toNumberOrUndefined(questionId);
-    console.log(cleanquestionId);
+    const cleanQuestionId  = toNumberOrUndefined(questionId);
 
-    if (!Number.isInteger(cleanquestionId) || cleanquestionId < 1) {
+    if (!Number.isInteger(cleanQuestionId ) || cleanQuestionId  < 1) {
       const err = new Error("questionId requires a postive integer");
       err.statusCode = 400;
       throw err;
     }
     
-    const { rows } = await pool.query("SELECT * FROM questions WHERE id = $1", [cleanquestionId]);
+    const [
+      questionResult,
+      topicsResult,
+      examplesResult,
+      solutionsResult,
+      linksResult,
+      companiesResult
+    ] = await Promise.all([
+      pool.query(
+        `SELECT id, title, problem_statement, notes, difficulty, display_order, estimated_time, xp FROM questions WHERE id = $1`,
+        [cleanQuestionId]
+      ),
+      pool.query(
+        `SELECT topic_id, name AS topic_name FROM question_topics AS qt JOIN topics AS t ON qt.topic_id = t.id WHERE qt.question_id = $1`,
+        [cleanQuestionId]
+      ),
+      pool.query(
+        `SELECT id, input, output, explanation FROM question_examples WHERE question_id = $1`,
+        [cleanQuestionId]
+      ),
+      pool.query(
+        `SELECT id, language_name, solution, description FROM question_solutions WHERE question_id = $1 ORDER BY language_name`,
+        [cleanQuestionId]
+      ),
+      pool.query(
+        `SELECT id, platform, link FROM question_platform_links WHERE question_id = $1`,
+        [cleanQuestionId]
+      ),
+      pool.query(
+        `SELECT qc.company_id, c.name FROM question_companies AS qc INNER JOIN companies AS c ON qc.company_id = c.id WHERE qc.question_id = $1 ORDER BY c.name`,
+        [cleanQuestionId]
+      )
+    ]);
 
-    if (rows.length === 0) {
-      return res.status(200).json({ message: "Question does not exist" });
+    if (questionResult.rows.length === 0) {
+      const err = new Error("Question does not exist");
+      err.statusCode = 404;
+      throw err;
     }
-    return res.status(200).json({ question: rows[0], message: "question fetched successfully" });
+    
+    return res.status(200).json({ questionDetails: {
+      question: questionResult.rows[0],
+      topics: topicsResult.rows,
+      examples: examplesResult.rows,
+      solutions: solutionsResult.rows,
+      platform_links: linksResult.rows,
+      companies: companiesResult.rows
+    }, message: "Question details fetched successfully."});
   } catch (err) {
     next(err);
   }
