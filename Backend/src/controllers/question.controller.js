@@ -1,7 +1,6 @@
 import pool from "../config/db.js";
 import { difficultyEnum } from "../constants/enums.js";
-
-const toNumberOrUndefined = (value) => value !== undefined ? Number(value) : undefined;
+import { toNumberOrUndefined, isValidInteger } from "../lib/validation.js";
 
 const insertQueryField = (updates, values, field, fieldVal) => {
     updates.push(`${field} = $${values.length + 1}`);
@@ -10,11 +9,17 @@ const insertQueryField = (updates, values, field, fieldVal) => {
   
 export async function getQuestionById(req, res, next) {
   try {
-    const questionId = req.params?.id;
-    const cleanQuestionId  = toNumberOrUndefined(questionId);
+    const cleanUserId = toNumberOrUndefined(req?.user?.id);
+    const cleanQuestionId  = toNumberOrUndefined(req?.params?.id);
 
-    if (!Number.isInteger(cleanQuestionId ) || cleanQuestionId  < 1) {
+    if (!isValidInteger(cleanQuestionId)) {
       const err = new Error("questionId requires a postive integer");
+      err.statusCode = 400;
+      throw err;
+    }
+    
+    if (!isValidInteger(cleanUserId)) {
+      const err = new Error("userId is required.");
       err.statusCode = 400;
       throw err;
     }
@@ -25,7 +30,8 @@ export async function getQuestionById(req, res, next) {
       examplesResult,
       solutionsResult,
       linksResult,
-      companiesResult
+      companiesResult,
+      bookmarkResult
     ] = await Promise.all([
       pool.query(
         `SELECT id, title, problem_statement, notes, difficulty, display_order, estimated_time, xp FROM questions WHERE id = $1`,
@@ -50,6 +56,10 @@ export async function getQuestionById(req, res, next) {
       pool.query(
         `SELECT qc.company_id, c.name FROM question_companies AS qc INNER JOIN companies AS c ON qc.company_id = c.id WHERE qc.question_id = $1 ORDER BY c.name`,
         [cleanQuestionId]
+      ),
+      pool.query(
+        `SELECT EXISTS (SELECT 1 FROM bookmarks WHERE user_id = $1 AND question_id = $2) AS is_bookmarked`,
+        [cleanUserId, cleanQuestionId]
       )
     ]);
 
@@ -59,14 +69,17 @@ export async function getQuestionById(req, res, next) {
       throw err;
     }
     
-    return res.status(200).json({ questionDetails: {
+    const questionDetails = {
       question: questionResult.rows[0],
       topics: topicsResult.rows,
       examples: examplesResult.rows,
       solutions: solutionsResult.rows,
       platform_links: linksResult.rows,
-      companies: companiesResult.rows
-    }, message: "Question details fetched successfully."});
+      companies: companiesResult.rows,
+      bookmark: bookmarkResult.rows[0].is_bookmarked
+    }
+    
+    return res.status(200).json({ questionDetails, message: "Question details fetched successfully."});
   } catch (err) {
     next(err);
   }

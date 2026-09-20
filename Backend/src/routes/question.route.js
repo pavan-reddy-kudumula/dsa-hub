@@ -5,7 +5,7 @@ import { getQuestionById, updateQuestion, deleteQuestion } from "../controllers/
 
 const router = express.Router();
 
-router.get("/:id", getQuestionById);
+router.get("/:id", protectRoute, getQuestionById);
 
 router.patch("/:id", protectRoute, verifyAdmin, updateQuestion);
 
