@@ -102,7 +102,7 @@ export async function updateUserQuestion(req, res, next) {
     const { rows: userQuestion } = await client.query("SELECT status FROM user_questions WHERE user_id = $1 AND question_id = $2 FOR UPDATE", [cleanUserId, cleanQuestionId]);
     
     if (userQuestion.length === 0) {
-      const err = new Error("Question does not exist.");
+      const err = new Error("User Question does not exist.");
       err.statusCode = 404;
       throw err;
     }
@@ -121,6 +121,16 @@ export async function updateUserQuestion(req, res, next) {
 
     const { rows } = await client.query(`UPDATE user_questions SET ${query.join(" ,")} WHERE user_id = $${index++} AND question_id = $${index} RETURNING user_id, question_id, status, attempts, solved_at, created_at, updated_at`, values);
 
+    if (cleanStatus === "solved" && userQuestion[0].status !== "solved") {
+      const { rows } = await client.query("SELECT xp FROM questions WHERE id = $1", [cleanQuestionId]);
+      if (rows.length === 0) {
+        const err = new Error("Question does not exist.");
+        err.statusCode = 400;
+        throw err;
+      }
+      await client.query(`UPDATE users SET total_xp = total_xp + $1 WHERE id = $2`, [rows[0].xp, cleanUserId]);
+    }
+    
     await client.query("COMMIT");
     transactionBegin = false;
 
