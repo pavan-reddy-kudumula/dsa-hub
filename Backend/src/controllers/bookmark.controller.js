@@ -12,7 +12,7 @@ export async function getBookmarks(req, res, next) {
       throw err;
     }
 
-    const { rows: bookmarks } = await pool.query("SELECT b.question_id, q.title, q.difficulty FROM bookmarks AS b INNER JOIN questions AS q ON b.question_id = q.id WHERE b.user_id = $1", [cleanUserId]);
+    const { rows: bookmarks } = await pool.query("SELECT b.question_id, q.title, q.difficulty, q.pattern_id FROM bookmarks AS b INNER JOIN questions AS q ON b.question_id = q.id WHERE b.user_id = $1", [cleanUserId]);
 
     return res.status(200).json({ bookmarks, message: "Bookmarks fetched successfully." });
     
