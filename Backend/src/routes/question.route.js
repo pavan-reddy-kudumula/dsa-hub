@@ -1,9 +1,11 @@
 import express from "express"
 import protectRoute from "../middleware/auth.middleware.js";
 import verifyAdmin from "../middleware/admin.middleware.js";
-import { getQuestionById, updateQuestion, deleteQuestion } from "../controllers/question.controller.js"
+import { getQuestions, getQuestionById, updateQuestion, deleteQuestion } from "../controllers/question.controller.js"
 
 const router = express.Router();
+
+router.get("/", protectRoute, getQuestions);
 
 router.get("/:id", protectRoute, getQuestionById);
 

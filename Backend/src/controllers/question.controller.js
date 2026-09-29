@@ -6,7 +6,17 @@ const insertQueryField = (updates, values, field, fieldVal) => {
     updates.push(`${field} = $${values.length + 1}`);
     values.push(fieldVal);
 }
-  
+ 
+export async function getQuestions(req, res, next) {
+  try {
+    const { rows } = await pool.query("SELECT * FROM questions ORDER BY difficulty");
+
+    return res.status(200).json({ questions: rows, message: "Questions fetched successfully." });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getQuestionById(req, res, next) {
   try {
     const cleanUserId = toNumberOrUndefined(req?.user?.id);
