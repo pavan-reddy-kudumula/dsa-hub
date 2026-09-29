@@ -100,7 +100,6 @@ export async function updateQuestion(req, res, next) {
   let transactionBegin = false;
   try {
     const { title, problem_statement, notes, difficulty, display_order, estimated_time, xp } = req.body || {};
-
     let cleanTitle;
     let cleanProblemStatement;
     let cleanNotes;
@@ -145,7 +144,7 @@ export async function updateQuestion(req, res, next) {
     }
 
     if (notes !== undefined) {
-      if (typeof notes !== "string" || notes.trim() === "") {
+      if (typeof notes !== "string") {
         const err = new Error("notes must be text.");
         err.statusCode = 400;
         throw err;   
